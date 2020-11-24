@@ -100,8 +100,6 @@ function updateBoard() {
 
 // Change tile in array.
 function changePiece(x=0, y=0) {
-    var audio = new Audio('wood.wav');
-    audio.play();
     if (!inactive) {
         // Check the piece, and if its blank, add the new piece.
         if (board[x][y] == "") {
@@ -113,6 +111,9 @@ function changePiece(x=0, y=0) {
                 turn = 1;
             }
             turnsmade ++;
+            // Play the placing sound...
+            var audio = new Audio('wood.wav');
+            audio.play();
         }
 
         updateBoard();
