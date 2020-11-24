@@ -13,9 +13,10 @@ let activePDisp = document.getElementById("activePlayer");
 let turnDisp = document.getElementById("turn");
 let xWinsDisp = document.getElementById("xwins");
 let oWinsDisp = document.getElementById("owins");
+let inputter = document.getElementById("boardSize");
 
 // Stop users from changing board size with keyboard.
-document.getElementById("boardSize").addEventListener("keydown", (event) => {
+inputter.addEventListener("keydown", (event) => {
     event.preventDefault();
 });
 
@@ -84,9 +85,9 @@ function updateBoard() {
     for (let row = 1; row <= boardSize; row++) {
         for (let column = 1; column <= boardSize; column++) {
             if (board[row][column] == "") {
-                boardDisp.innerHTML += `<div class="piece dark" onclick="changePiece(${row}, ${column})">${board[row][column]}</div>`;
+                boardDisp.innerHTML += `<div class="piece dark" id="${row}, ${column}" onclick="changePiece(${row}, ${column})">${board[row][column]}</div>`;
             } else {
-                boardDisp.innerHTML += `<div class="piece" onclick="changePiece(${row}, ${column})">${board[row][column]}</div>`;
+                boardDisp.innerHTML += `<div class="piece" id="${row}, ${column}" onclick="changePiece(${row}, ${column})">${board[row][column]}</div>`;
             }
         }
     }
@@ -128,8 +129,16 @@ function updateNums() {
     }
 
     // Win streaks:
-    xWinsDisp.innerText = `X - ${xWins} Wins`;
-    oWinsDisp.innerText = `O - ${oWins} Wins`;
+    if (xWins == 1) {
+        xWinsDisp.innerText = `X - ${xWins} Win`;
+    } else {
+        xWinsDisp.innerText = `X - ${xWins} Wins`;
+    }
+    if (oWins == 1) {
+        oWinsDisp.innerText = `O - ${oWins} Win`;
+    } else {
+        oWinsDisp.innerText = `O - ${oWins} Wins`;
+    }
 
     // How many turns.
     turnDisp.innerText = `Turn: ${turnsmade}`;
@@ -152,10 +161,18 @@ function checkScore() {
             }
         }
         if (counterO == boardSize) {
+            // Highlight row.
+            for (let i = 1; i <= boardSize; i++) {
+                document.getElementById(`${row}, ${i}`).classList.add("greenText");
+            }
             p1Wins();
             return;
         }
         if (counterX == boardSize) {
+            // Highlight row.
+            for (let i = 1; i <= boardSize; i++) {
+                document.getElementById(`${row}, ${i}`).classList.add("greenText");
+            }
             p2Wins();
             return;
         }
@@ -174,10 +191,17 @@ function checkScore() {
             }
         }
         if (counterO == boardSize) {
+            // Highlight row.
+            for (let i = 1; i <= boardSize; i++) {
+                document.getElementById(`${i}, ${column}`).classList.add("greenText");
+            }
             p1Wins();
             return;
         }
         if (counterX == boardSize) {
+            for (let i = 1; i <= boardSize; i++) {
+                document.getElementById(`${i}, ${column}`).classList.add("greenText");
+            }
             p2Wins();
             return;
         }
@@ -194,10 +218,18 @@ function checkScore() {
             continue;
         }
         if (counterO == boardSize) {
+            // Highlight row.
+            for (let i = 1; i <= boardSize; i++) {
+                document.getElementById(`${i}, ${i}`).classList.add("greenText");
+            }
             p1Wins();
             return;
         }
         if (counterX == boardSize) {
+            // Highlight row.
+            for (let i = 1; i <= boardSize; i++) {
+                document.getElementById(`${i}, ${i}`).classList.add("greenText");
+            }
             p2Wins();
             return;
         }
@@ -214,10 +246,18 @@ function checkScore() {
             continue;
         }
         if (counterO == boardSize) {
+            // Highlight row.
+            for (let i = 1; i <= boardSize; i++) {
+                document.getElementById(`${i}, ${(Number(boardSize)+1)-i}`).classList.add("greenText");
+            }
             p1Wins();
             return;
         }
         if (counterX == boardSize) {
+            // Highlight row.
+            for (let i = 1; i <= boardSize; i++) {
+                document.getElementById(`${i}, ${(Number(boardSize)+1)-i}`).classList.add("greenText");
+            }
             p2Wins();
             return;
         }
@@ -244,6 +284,7 @@ function p1Wins() {
     document.getElementById("winnerdisplay").style.display = "block";
     oWins ++;
     inactive = true;
+    confetti.start();
 }
 
 function p2Wins() {
@@ -252,6 +293,7 @@ function p2Wins() {
     document.getElementById("winnerdisplay").style.display = "block";
     xWins ++;
     inactive = true;
+    confetti.start();
 }
 
 function stale() {
