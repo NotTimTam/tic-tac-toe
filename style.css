@@ -170,3 +170,22 @@ input:hover {
     background: url(images/darkwood.jpg);
     filter: brightness(75%);
 }
+
+.help {
+    height: 200px;
+    border-radius: 0.4em;
+    box-shadow:  4px 4px 5px black;
+
+    opacity: 100%;
+
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 12%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+
+    transition-property: all;
+    transition-delay: 5s;
+    transition-duration: 3s;
+}

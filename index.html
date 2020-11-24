@@ -12,7 +12,7 @@
     <title>Tic-Tac-Toe</title>
 
     <link rel='stylesheet' href='style.css'>
-    <link rel='shortcut icon' href='favicon.png' type='image/x-icon'>
+    <link rel='shortcut icon' href='images/favicon.png' type='image/x-icon'>
 </head>
 <body>
 
@@ -34,6 +34,8 @@
             <span style="text-align: right; float: right;" id="xwins">X - 0 Wins</span>
         </div>
     </div>
+
+    <img src="images/animation.gif" alt="" class="help" onload="this.style='opacity: 0;'">
 
     <div id="winnerdisplay" style="display: none;"><h1 id="winnertext">Player Nobody Wins!</h1>
         <input type="button" value="Restart" onclick="newGame();">
