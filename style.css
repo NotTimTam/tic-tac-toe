@@ -1,0 +1,172 @@
+html {
+    font-family: 'Courier New', Courier, monospace;
+
+    text-shadow: 1.5px 1.5px 0px black;
+    color: white;
+    font-weight: bolder;
+}
+
+/* BOARD */
+.grid {
+    display: grid;
+
+    align-content: space-between;
+    justify-content: space-between;
+
+    grid-gap: 12px;
+    
+    background: url(images/darkwood.jpg);
+    background-size: 512px 512px;
+
+    width: min-content;
+    padding: 30px;
+
+    box-shadow: 10px 10px 5px black;
+
+    border-radius: 0.2em;
+
+    margin-bottom: 5px;
+}
+
+.board {
+    background: url(images/darkwood.jpg);
+    background-size: 512px 512px;
+
+    box-shadow: 10px 10px 5px black;
+
+    padding: 50px;
+
+    border-radius: 0.2em;
+
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+/* SMALLER DISPLAYS */
+
+.data {
+    background: url(images/darkwood.jpg);
+    background-size: 512px 512px;
+    
+    box-shadow: 10px 10px 5px black;
+
+    padding: 50px;
+
+    width: max-content;
+
+    border-radius: 0.2em;
+
+    margin: 0 auto;
+
+    margin-top: 5px;
+
+    text-align: center;
+}
+
+.display {
+    display: inline-flex;
+    flex-direction: column;
+
+    justify-content: center;
+
+    width: fit-content;
+}
+
+body {
+    width: min-content;
+    margin: 0 auto;
+}
+
+#wins {
+    background: url(images/darkwood.jpg);
+    background-size: 512px 512px;
+    box-shadow: 10px 10px 5px black;
+    padding: 15px;
+    border-radius: 0.2em;
+
+    text-align: center;
+}
+
+#winnerdisplay {
+    z-index: 15;
+
+    width: max-content;
+    min-width: 400px;
+
+    background: url(images/darkwood.jpg);
+    background-size: 512px 512px;
+    box-shadow: 10px 10px 5px black;
+    padding: 15px;
+    border-radius: 0.2em;
+
+    height: 150px;
+
+    text-align: center;
+
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+input {
+    outline: none;
+    background: url(images/darkwood.jpg);
+    filter: brightness(75%);
+    border: none;
+    padding: 15px;
+    box-shadow: 5px 5px 5px black;
+
+    margin-top: 10px;
+
+    transition-property: filter border;
+    transition-duration: 0.1s;
+
+    border: 1px solid black;
+
+    color: white;
+}
+
+input:hover {
+    filter: brightness(100%);
+    border: 1px solid greenyellow;
+}
+
+/* BOARD ITEMS */
+.piece {
+    width: 64px;
+    height: 64px;
+    
+    background: url(images/wood.jpg);
+    border-radius: 0.2em;
+
+    text-align: center;
+    font-size: 2.3em;
+
+    text-indent: -10px;
+
+    line-height: 54px;
+
+    text-shadow: 1.5px 1.5px 0px black;
+    color: white;
+    font-weight: bolder;
+
+    box-shadow: inset -6px -6px 10px #4e260b, 4px 4px 5px black;
+
+    transition-property: filter;
+    transition-duration: 0.1s;
+
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.dark:hover {
+    filter: brightness(100%);
+}
+
+.dark {
+    box-shadow: inset 8px 8px 15px black;
+    background: url(images/darkwood.jpg);
+    filter: brightness(75%);
+}
