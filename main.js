@@ -222,6 +222,19 @@ function checkScore() {
             return;
         }
     }
+    // Check if its a stalemate.
+    let staleCounter = 0;
+    for (let row = 1; row <= boardSize; row++) {
+        for (let column = 1; column <= boardSize; column++) {
+            if (board[row][column] == "X" || board[row][column] == "O") {
+                staleCounter ++;
+            }
+        }
+    }
+    if (staleCounter == boardSize**2) {
+        stale();
+        return;
+    }
 }
 
 // If the players win:
@@ -238,5 +251,12 @@ function p2Wins() {
     document.getElementById("winnertext").innerText = "Player Two Wins!";
     document.getElementById("winnerdisplay").style.display = "block";
     xWins ++;
+    inactive = true;
+}
+
+function stale() {
+    console.log("Stalemate.");
+    document.getElementById("winnertext").innerText = "Stalemate.";
+    document.getElementById("winnerdisplay").style.display = "block";
     inactive = true;
 }
