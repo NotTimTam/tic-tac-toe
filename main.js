@@ -90,6 +90,7 @@ function newGame() {
         boardDisp.innerHTML += `
         <p>Vs. bot? <input type="checkbox" name="" id="isBot"></p>`
     }
+    
     boardDisp.innerHTML += `
     <input type="button" value="Start" onclick="resetGame();">`
     boardDisp.classList.remove("grid");
