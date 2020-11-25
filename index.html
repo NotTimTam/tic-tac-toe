@@ -19,7 +19,6 @@
     <div class="display">
         <div class="data">
             <h1>Tic-Tac-Toe</h1>
-            <h3><span id="activePlayer">Player: O</span> | <span id="turn">Turn: 0</span></h3>
         </div>
 
         <div class="board" id="board">
@@ -31,11 +30,12 @@
 
         <div id="wins">
             <h3>wins <input type="button" value="&#8634;" onclick="newGame();"></h3>
+            <h3><span id="activePlayer">Player: O</span> | <span id="turn">Turn: 0</span></h3>
             <span style="text-align: left; float: left;" id="owins">O - 0 Wins</span>
             <span style="text-align: right; float: right;" id="xwins">X - 0 Wins</span>
         </div>
     </div>
-    
+
     <div id="winnerdisplay" style="display: none;"><h1 id="winnertext">Player Nobody Wins!</h1>
         <input type="button" value="Restart" onclick="newGame();">
     </div>
