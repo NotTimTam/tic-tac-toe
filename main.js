@@ -1,3 +1,5 @@
+"use strict";
+
 // Initial variables
 let turn = 1;
 let xWins = 0;
@@ -6,6 +8,7 @@ let turnsmade = 0;
 let board = [];
 let boardSize = 0;
 let inactive = false;
+let vsBot = false;
 
 // Initial displays.
 let boardDisp = document.getElementById("board");
@@ -27,6 +30,13 @@ function resetGame() {
     turnsmade = 0;
     board = [];
     inactive = false;
+    
+    // Check if the user is playing against a bot.
+    if (document.getElementById("isBot").checked) {
+        vsBot = true;
+    } else {
+        vsBot = false;
+    }
 
     // Grab the requested size.
     boardSize = document.getElementById("boardSize").value;
@@ -70,8 +80,18 @@ function resetGame() {
 function newGame() {
     boardDisp.innerHTML = `
     <h1>Board Setup</h1>
-        <p>Size: <input type="number" name="number" id="boardSize" step="1" min="3" max="10" value="3" onclick="this.blur"></p>
-        <input type="button" value="Start" onclick="resetGame();">`;
+    <p>Size: <input type="number" name="number" id="boardSize" step="1" min="3" max="10" value="3" onclick="this.blur"></p>
+    `;
+
+    if (vsBot) {
+        boardDisp.innerHTML += `
+        <p>Vs. bot? <input type="checkbox" name="" id="isBot" checked></p>`
+    } else {
+        boardDisp.innerHTML += `
+        <p>Vs. bot? <input type="checkbox" name="" id="isBot"></p>`
+    }
+    boardDisp.innerHTML += `
+    <input type="button" value="Start" onclick="resetGame();">`
     boardDisp.classList.remove("grid");
     document.getElementById("winnerdisplay").style.display = "none";
 }
@@ -99,7 +119,7 @@ function updateBoard() {
 }
 
 // Change tile in array.
-function changePiece(x=0, y=0) {
+function changePiece(x=1, y=1) {
     if (!inactive) {
         // Check the piece, and if its blank, add the new piece.
         if (board[x][y] == "") {
@@ -145,6 +165,11 @@ function updateNums() {
 
     // How many turns.
     turnDisp.innerText = `Turn: ${turnsmade}`;
+
+    // Run the bot.
+    if (vsBot && turn == 0) {
+        startArtificialIdiot();
+    }
 }
 
 // Check the score.
@@ -304,4 +329,51 @@ function stale() {
     document.getElementById("winnertext").innerText = "Stalemate.";
     document.getElementById("winnerdisplay").style.display = "block";
     inactive = true;
+}
+
+// AI
+function startArtificialIdiot() {
+    // General analytical skills.
+    // First the bot will look for open rows, once it finds one it will check adjacent columns, and diagonals for the best play...
+    let optimalPlay = [];
+    let safeRows = [];
+
+    // Generate row css.
+    for (let row = 1; row <= boardSize; row++) {
+        safeRows.push(row);
+    }
+
+    console.log(safeRows)
+
+    // Loop through and remove rows that have player one's tile in them, or are full.
+    rows: 
+    for (let checkedRow = 1; checkedRow <= boardSize; checkedRow++) {
+        // Go through each row, and check if all columns are empty.
+        let columnsFull = 0;
+        for (let column = 1; column <= boardSize; column++) {
+            // If a row is occupied, we te add to the columnsFull counter.
+            if (board[checkedRow][column] != "") {
+                columnsFull ++;
+            }
+        }
+
+        // If this row is full, then we remove it from the list.
+        if (columnsFull == boardSize) {
+            console.warn(`AI: Row ${checkedRow} is full. Deleting it from the list.`);
+            safeRows.splice(safeRows.indexOf(checkedRow), 1);
+        }
+    }
+
+    // If we can't find a good play we safely abort with a random play.
+    if (safeRows.length == 0) {
+        console.warn("AI: Playing randomly because I can't find a good place to play...");
+        changePiece(Math.ceil(Math.random()*boardSize), Math.ceil(Math.random()*boardSize));
+    }
+
+    // Temporarily randomly play in one of the safe rows.
+    let rowPick = safeRows[Math.floor(Math.random() * safeRows.length)];
+    console.warn(`AI: Moving to row ${rowPick} from ${safeRows}`);
+    changePiece(rowPick, Math.ceil(Math.random()*boardSize));
+
+    console.log(safeRows);
 }
