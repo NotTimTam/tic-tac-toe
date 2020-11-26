@@ -41,8 +41,6 @@ function resetGame() {
     // Grab the requested size.
     boardSize = document.getElementById("boardSize").value;
 
-    console.log(`Creating board of size ${boardSize}.`)
-
     // Clear the boards html.
     boardDisp.innerHTML = "";
 
@@ -55,9 +53,6 @@ function resetGame() {
         }
         board[row] = genRow;
     }
-
-    console.log(`Generated board:`);
-    console.log(board);
 
     // Add the grid class for proper display.
     boardDisp.classList.add("grid");
@@ -90,7 +85,7 @@ function newGame() {
         boardDisp.innerHTML += `
         <p>Vs. bot? <input type="checkbox" name="" id="isBot"></p>`
     }
-    
+
     boardDisp.innerHTML += `
     <input type="button" value="Start" onclick="resetGame();">`
     boardDisp.classList.remove("grid");
@@ -137,6 +132,11 @@ function changePiece(x=1, y=1) {
             audio.play();
         }
 
+        // Run the bot.
+        if (vsBot && turn == 0) {
+            startArtificialIdiot();
+        }
+
         updateBoard();
         updateNums();
     }
@@ -166,11 +166,6 @@ function updateNums() {
 
     // How many turns.
     turnDisp.innerText = `Turn: ${turnsmade}`;
-
-    // Run the bot.
-    if (vsBot && turn == 0) {
-        startArtificialIdiot();
-    }
 }
 
 // Check the score.
@@ -308,7 +303,6 @@ function checkScore() {
 
 // If the players win:
 function p1Wins() {
-    console.log("Player one wins!");
     document.getElementById("winnertext").innerText = "Player One Wins!";
     document.getElementById("winnerdisplay").style.display = "block";
     oWins ++;
@@ -317,7 +311,6 @@ function p1Wins() {
 }
 
 function p2Wins() {
-    console.log("Player two wins!");
     document.getElementById("winnertext").innerText = "Player Two Wins!";
     document.getElementById("winnerdisplay").style.display = "block";
     xWins ++;
@@ -326,55 +319,236 @@ function p2Wins() {
 }
 
 function stale() {
-    console.log("Stalemate.");
     document.getElementById("winnertext").innerText = "Stalemate.";
     document.getElementById("winnerdisplay").style.display = "block";
     inactive = true;
 }
 
+
+
+
+
+
+
+
+
+//
+//
+//
+//       -BELOW IS THE CODE FOR THE AI. DONT STEAL IT OR ANYTHING BRO-
+//                                    --
+//                                   ----
+//                           -SERIOUSLY, DON'T.-
+//
+//
+//
+
+
+
+
+
+
+
+
+
 // AI
 function startArtificialIdiot() {
-    // General analytical skills.
-    // First the bot will look for open rows, once it finds one it will check adjacent columns, and diagonals for the best play...
     let optimalPlay = [];
-    let safeRows = [];
+    let potentialMoves = [];
 
-    // Generate row css.
+    // Add every possible move on the board to the potentialMoves array.
     for (let row = 1; row <= boardSize; row++) {
-        safeRows.push(row);
+        for (let column = 1; column <= boardSize; column++) {
+            potentialMoves.push([row, column]);
+        }
     }
 
-    console.log(safeRows)
+    let toDelete = [];
 
-    // Loop through and remove rows that have player one's tile in them, or are full.
-    rows: 
-    for (let checkedRow = 1; checkedRow <= boardSize; checkedRow++) {
-        // Go through each row, and check if all columns are empty.
-        let columnsFull = 0;
-        for (let column = 1; column <= boardSize; column++) {
-            // If a row is occupied, we te add to the columnsFull counter.
-            if (board[checkedRow][column] != "") {
-                columnsFull ++;
+    // Loop through this array and remove every single move that would overwrite an already existing tile.
+    for (let i = 0; i < potentialMoves.length; i++) {
+        if (board[potentialMoves[i][0]][potentialMoves[i][1]] != "") {
+            toDelete.push(potentialMoves[i]);
+        }
+    }
+
+    // Remove everything.
+    for (let i = 0; i < toDelete.length; i++) {
+        potentialMoves.splice(potentialMoves.indexOf(toDelete[i]), 1);
+        console.log(`Deleting: ${toDelete[i]}`);
+    }
+
+    // If there are no available moves, give up...
+    if (potentialMoves.length == 0) {
+        return;
+    }
+
+    console.log(potentialMoves);
+
+    // Loop through and delete any moves that cause an issue using the validity checker.
+    for (let i = 0; i < potentialMoves.length; i++) {
+        // Generate a new version of the map for testing.
+        let newBoard = board.slice();
+
+        // Place a token and see what happens.
+        newBoard[potentialMoves[i][0]][potentialMoves[i][1]] = "X";
+        let valid = validity(newBoard);
+        console.log(valid);
+        if (valid == "win") {
+            // If the move is a winning move, we place the piece and break.
+            optimalPlay[0] = potentialMoves[i][0];
+            optimalPlay[1] = potentialMoves[i][1];
+            console.log("Optimal MOVE!");
+            break;
+        } else if (valid == "lose" || valid == "stale") {
+            // If we lose or cause a stalemate we get rid of this potential move and try again.
+            toDelete.push(potentialMoves[i]);
+            continue;
+        } else if (valid == "partial") {
+            // If the piece is a partial move, meaning nothing happens, we continue...
+            toDelete.push(potentialMoves[i]);
+            continue;
+        } else {
+            console.error("Validity check error.");
+            continue;
+        }
+    }
+
+    // Remove everything.
+    for (let i = 0; i < toDelete.length; i++) {
+        potentialMoves.splice(potentialMoves.indexOf(toDelete[i]), 1);
+        console.log(`Deleting during post: ${toDelete[i]}`);
+    }
+
+    // Play the optimal move.
+    console.log("Optimal play: " + optimalPlay);
+    console.log("BOT'S TURN IS OVER");
+    changePiece(optimalPlay[0], optimalPlay[1]);
+}
+
+// Check the validity of an AI move.
+function validity(bd=[]) {
+    let boardLength = boardSize;
+    // FOR PLAYER ONE
+    // Check rows (easiest)
+    for (let row = 1; row <= boardLength; row++) {
+        let counterO = 0
+        let counterX = 0;
+        for (let column = 1; column <= boardLength; column++) {
+            if (bd[row][column] == "O") {
+                counterO ++;
+            } else if (bd[row][column] == "X") {
+                counterX ++;
+            } else {
+                continue;
             }
         }
-
-        // If this row is full, then we remove it from the list.
-        if (columnsFull == boardSize) {
-            console.warn(`AI: Row ${checkedRow} is full. Deleting it from the list.`);
-            safeRows.splice(safeRows.indexOf(checkedRow), 1);
+        if (counterO == boardLength) {
+            // Highlight row.
+            for (let i = 1; i <= boardLength; i++) {
+                document.getElementById(`${row}, ${i}`).classList.add("greenText");
+            }
+            return "lose";
+        }
+        if (counterX == boardLength) {
+            // Highlight row.
+            for (let i = 1; i <= boardLength; i++) {
+                document.getElementById(`${row}, ${i}`).classList.add("greenText");
+            }
+            return "win";
         }
     }
-
-    // If we can't find a good play we safely abort with a random play.
-    if (safeRows.length == 0) {
-        console.warn("AI: Playing randomly because I can't find a good place to play...");
-        changePiece(Math.ceil(Math.random()*boardSize), Math.ceil(Math.random()*boardSize));
+    // Check columns.
+    for (let column = 1; column <= boardLength; column++) {
+        let counterO = 0;
+        let counterX = 0;
+        for (let row = 1; row <= boardLength; row++) {
+            if (bd[row][column] == "X") {
+                counterX ++;
+            } else if (bd[row][column] == "O") {
+                counterO ++;
+            } else {
+                continue;
+            }
+        }
+        if (counterO == boardLength) {
+            // Highlight row.
+            for (let i = 1; i <= boardLength; i++) {
+                document.getElementById(`${i}, ${column}`).classList.add("greenText");
+            }
+            return "lose";
+        }
+        if (counterX == boardLength) {
+            for (let i = 1; i <= boardLength; i++) {
+                document.getElementById(`${i}, ${column}`).classList.add("greenText");
+            }
+            return "win";
+        }
+    }
+    // Check across. Left to Right
+    let counterO = 0;
+    let counterX = 0;
+    for (let i = 1; i <= boardLength; i++) {
+        if (bd[i][i] == "X") {
+            counterX ++;
+        } else if (bd[i][i] == "O") {
+            counterO ++;
+        } else {
+            continue;
+        }
+        if (counterO == boardLength) {
+            // Highlight row.
+            for (let i = 1; i <= boardLength; i++) {
+                document.getElementById(`${i}, ${i}`).classList.add("greenText");
+            }
+            return "lose";
+        }
+        if (counterX == boardLength) {
+            // Highlight row.
+            for (let i = 1; i <= boardLength; i++) {
+                document.getElementById(`${i}, ${i}`).classList.add("greenText");
+            }
+            return "win";
+        }
+    }
+    // Check across. Right to Left
+    counterO = 0;
+    counterX = 0;
+    for (let i = 1; i <= boardLength; i++) {
+        if (bd[i][(Number(boardLength)+1)-i] == "X") {
+            counterX ++;
+        } else if (bd[i][(Number(boardLength)+1)-i] == "O") {
+            counterO ++;
+        } else {
+            continue;
+        }
+        if (counterO == boardLength) {
+            // Highlight row.
+            for (let i = 1; i <= boardLength; i++) {
+                document.getElementById(`${i}, ${(Number(boardLength)+1)-i}`).classList.add("greenText");
+            }
+            return "lose";
+        }
+        if (counterX == boardLength) {
+            // Highlight row.
+            for (let i = 1; i <= boardLength; i++) {
+                document.getElementById(`${i}, ${(Number(boardLength)+1)-i}`).classList.add("greenText");
+            }
+            return "win";
+        }
+    }
+    // Check if its a stalemate.
+    let staleCounter = 0;
+    for (let row = 1; row <= boardLength; row++) {
+        for (let column = 1; column <= boardLength; column++) {
+            if (bd[row][column] == "X" || bd[row][column] == "O") {
+                staleCounter ++;
+            }
+        }
+    }
+    if (staleCounter == boardLength**2) {
+        return "stale";
     }
 
-    // Temporarily randomly play in one of the safe rows.
-    let rowPick = safeRows[Math.floor(Math.random() * safeRows.length)];
-    console.warn(`AI: Moving to row ${rowPick} from ${safeRows}`);
-    changePiece(rowPick, Math.ceil(Math.random()*boardSize));
-
-    console.log(safeRows);
+    return "partial";
 }
