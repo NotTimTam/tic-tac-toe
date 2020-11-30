@@ -23,7 +23,7 @@
 
         <div class="board" id="board">
             <h1>Board Setup</h1>
-            <p>Size: <input type="number" name="number" id="boardSize" step="1" min="3" max="10" value="3" onclick="this.blur"></p>
+        <p>Size: <input type="number" name="number" id="boardSize" step="1" min="3" max="10" value="3" onclick="this.blur; if (this.value == 3 ) { document.getElementById('isBot').removeAttribute('disabled'); } else { document.getElementById('isBot').setAttribute('disabled', true); }"></p>
             <p>Vs. bot? <input type="checkbox" name="" id="isBot"></p>
             <input type="button" value="Start" onclick="resetGame();">
         </div>

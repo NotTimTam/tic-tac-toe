@@ -86,7 +86,7 @@ var confetti = {
 		}
 	}
 
-	function startConfetti(timeout=5000, min, max) {
+	function startConfetti(timeout=2500, min, max) {
         var audio = new Audio('horn.wav');
         audio.play();
 

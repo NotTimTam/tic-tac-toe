@@ -44,6 +44,11 @@ function resetGame() {
     // Clear the boards html.
     boardDisp.innerHTML = "";
 
+    // Turn off the bot if the board is bigger than a 3x3.
+    if (boardSize > 3) {
+        
+    }
+
     // Generate the board array.
     for (let row = 1; row <= boardSize; row++) {
         // Generate each row.
@@ -119,22 +124,27 @@ function changePiece(x=1, y=1) {
     if (!inactive) {
         // Check the piece, and if its blank, add the new piece.
         if (board[x][y] == "") {
-            if (turn == 1) {
-                board[x][y] = "O";
-                turn = 0;
-            } else {
-                board[x][y] = "X";
+            // Run the bot.
+            if (turn == 0 && vsBot) {
+                let move = getBestPlayForBot();
+                board[move[0]][move[1]] = "X";
                 turn = 1;
+            } else {
+                if (turn == 0) {
+                    board[x][y] = "X";
+                    turn = 1;
+                }
+                else if (turn == 1) {
+                    board[x][y] = "O";
+                    turn = 0;
+                }
             }
+
             turnsmade ++;
+            
             // Play the placing sound...
             var audio = new Audio('wood.wav');
             audio.play();
-        }
-
-        // Run the bot.
-        if (vsBot && turn == 0) {
-            startArtificialIdiot();
         }
 
         updateBoard();
@@ -352,78 +362,41 @@ function stale() {
 
 
 // AI
-function startArtificialIdiot() {
-    let optimalPlay = [];
+function getBestPlayForBot() {
     let potentialMoves = [];
+    let optimalMove = [];
 
-    // Add every possible move on the board to the potentialMoves array.
     for (let row = 1; row <= boardSize; row++) {
         for (let column = 1; column <= boardSize; column++) {
             potentialMoves.push([row, column]);
         }
     }
 
-    let toDelete = [];
-
-    // Loop through this array and remove every single move that would overwrite an already existing tile.
-    for (let i = 0; i < potentialMoves.length; i++) {
-        if (board[potentialMoves[i][0]][potentialMoves[i][1]] != "") {
-            toDelete.push(potentialMoves[i]);
-        }
-    }
-
-    // Remove everything.
-    for (let i = 0; i < toDelete.length; i++) {
-        potentialMoves.splice(potentialMoves.indexOf(toDelete[i]), 1);
-        console.log(`Deleting: ${toDelete[i]}`);
-    }
-
-    // If there are no available moves, give up...
-    if (potentialMoves.length == 0) {
-        return;
-    }
-
-    console.log(potentialMoves);
-
     // Loop through and delete any moves that cause an issue using the validity checker.
     for (let i = 0; i < potentialMoves.length; i++) {
         // Generate a new version of the map for testing.
         let newBoard = board.slice();
 
+        console.log(potentialMoves[i]);
+
         // Place a token and see what happens.
         newBoard[potentialMoves[i][0]][potentialMoves[i][1]] = "X";
-        let valid = validity(newBoard);
-        console.log(valid);
-        if (valid == "win") {
-            // If the move is a winning move, we place the piece and break.
-            optimalPlay[0] = potentialMoves[i][0];
-            optimalPlay[1] = potentialMoves[i][1];
-            console.log("Optimal MOVE!");
+        
+        if (validity(newBoard) == "win") {
+            optimalMove = [potentialMoves[i][0], potentialMoves[i][1]];
             break;
-        } else if (valid == "lose" || valid == "stale") {
-            // If we lose or cause a stalemate we get rid of this potential move and try again.
-            toDelete.push(potentialMoves[i]);
-            continue;
-        } else if (valid == "partial") {
-            // If the piece is a partial move, meaning nothing happens, we continue...
-            toDelete.push(potentialMoves[i]);
-            continue;
         } else {
-            console.error("Validity check error.");
+            console.log(`I for that one loop: ${i}`);
             continue;
         }
     }
 
-    // Remove everything.
-    for (let i = 0; i < toDelete.length; i++) {
-        potentialMoves.splice(potentialMoves.indexOf(toDelete[i]), 1);
-        console.log(`Deleting during post: ${toDelete[i]}`);
+    if (optimalMove == []) {
+        optimalMove = potentialMoves[Math.floor(Math.random() * potentialMoves.length)];
+        console.log("Im an idiot so Im playing randomly now.")
     }
 
-    // Play the optimal move.
-    console.log("Optimal play: " + optimalPlay);
-    console.log("BOT'S TURN IS OVER");
-    changePiece(optimalPlay[0], optimalPlay[1]);
+    return optimalMove;
 }
 
 // Check the validity of an AI move.
