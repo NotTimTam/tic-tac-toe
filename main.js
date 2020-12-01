@@ -8,7 +8,6 @@ let turnsmade = 0;
 let board = [];
 let boardSize = 0;
 let inactive = false;
-let vsBot = false;
 
 // Initial displays.
 let boardDisp = document.getElementById("board");
@@ -30,24 +29,12 @@ function resetGame() {
     turnsmade = 0;
     board = [];
     inactive = false;
-    
-    // Check if the user is playing against a bot.
-    if (document.getElementById("isBot").checked) {
-        vsBot = true;
-    } else {
-        vsBot = false;
-    }
 
     // Grab the requested size.
     boardSize = document.getElementById("boardSize").value;
 
     // Clear the boards html.
     boardDisp.innerHTML = "";
-
-    // Turn off the bot if the board is bigger than a 3x3.
-    if (boardSize > 3) {
-        vsBot = false;
-    }
 
     // Generate the board array.
     for (let row = 1; row <= boardSize; row++) {
@@ -90,13 +77,13 @@ function newGame() {
     <p>Size: <input type="number" name="number" id="boardSize" step="1" min="3" max="10" value="3" onclick="this.blur"></p>
     `;
 
-    if (vsBot) {
-        boardDisp.innerHTML += `
-        <p>Vs. bot? <input type="checkbox" name="" id="isBot" checked></p>`
-    } else {
-        boardDisp.innerHTML += `
-        <p>Vs. bot? <input type="checkbox" name="" id="isBot"></p>`
-    }
+    // if (vsBot) {
+    //     boardDisp.innerHTML += `
+    //     <p>Vs. bot? <input type="checkbox" name="" id="isBot" checked></p>`
+    // } else {
+    //     boardDisp.innerHTML += `
+    //     <p>Vs. bot? <input type="checkbox" name="" id="isBot"></p>`
+    // }
 
     boardDisp.innerHTML += `
     <input type="button" value="Start" onclick="resetGame();">`
@@ -131,20 +118,13 @@ function changePiece(x=1, y=1) {
     if (!inactive) {
         // Check the piece, and if its blank, add the new piece.
         if (board[x][y] == "") {
-            // Run the bot.
-            if (turn == 0 && vsBot) {
-                let move = getBestPlayForBot();
-                board[move[0]][move[1]] = "X";
+            if (turn == 0) {
+                board[x][y] = "X";
                 turn = 1;
-            } else {
-                if (turn == 0) {
-                    board[x][y] = "X";
-                    turn = 1;
-                }
-                else if (turn == 1) {
-                    board[x][y] = "O";
-                    turn = 0;
-                }
+            }
+            else if (turn == 1) {
+                board[x][y] = "O";
+                turn = 0;
             }
 
             turnsmade ++;
@@ -368,167 +348,167 @@ function stale() {
 
 
 
-// AI
-function getBestPlayForBot() {
-    let potentialMoves = [];
-    let optimalMove = [];
+// // AI
+// function getBestPlayForBot() {
+//     let potentialMoves = [];
+//     let optimalMove = [];
 
-    for (let row = 1; row <= boardSize; row++) {
-        for (let column = 1; column <= boardSize; column++) {
-            potentialMoves.push([row, column]);
-        }
-    }
+//     for (let row = 1; row <= boardSize; row++) {
+//         for (let column = 1; column <= boardSize; column++) {
+//             potentialMoves.push([row, column]);
+//         }
+//     }
 
-    // Loop through and delete any moves that cause an issue using the validity checker.
-    for (let i = 0; i < potentialMoves.length; i++) {
-        // Generate a new version of the map for testing.
-        let newBoard = board.slice();
+//     // Loop through and delete any moves that cause an issue using the validity checker.
+//     for (let i = 0; i < potentialMoves.length; i++) {
+//         // Generate a new version of the map for testing.
+//         let newBoard = board.slice();
 
-        console.log(potentialMoves[i]);
+//         console.log(potentialMoves[i]);
 
-        // Place a token and see what happens.
-        newBoard[potentialMoves[i][0]][potentialMoves[i][1]] = "X";
+//         // Place a token and see what happens.
+//         newBoard[potentialMoves[i][0]][potentialMoves[i][1]] = "X";
         
-        if (validity(newBoard) == "win") {
-            optimalMove = [potentialMoves[i][0], potentialMoves[i][1]];
-            break;
-        } else {
-            console.log(`I for that one loop: ${i}`);
-            continue;
-        }
-    }
+//         if (validity(newBoard) == "win") {
+//             optimalMove = [potentialMoves[i][0], potentialMoves[i][1]];
+//             break;
+//         } else {
+//             console.log(`I for that one loop: ${i}`);
+//             continue;
+//         }
+//     }
 
-    if (optimalMove == []) {
-        optimalMove = potentialMoves[Math.floor(Math.random() * potentialMoves.length)];
-        console.log("Im an idiot so Im playing randomly now.")
-    }
+//     if (optimalMove == []) {
+//         optimalMove = potentialMoves[Math.floor(Math.random() * potentialMoves.length)];
+//         console.log("Im an idiot so Im playing randomly now.")
+//     }
 
-    return optimalMove;
-}
+//     return optimalMove;
+// }
 
-// Check the validity of an AI move.
-function validity(bd=[]) {
-    let boardLength = boardSize;
-    // FOR PLAYER ONE
-    // Check rows (easiest)
-    for (let row = 1; row <= boardLength; row++) {
-        let counterO = 0
-        let counterX = 0;
-        for (let column = 1; column <= boardLength; column++) {
-            if (bd[row][column] == "O") {
-                counterO ++;
-            } else if (bd[row][column] == "X") {
-                counterX ++;
-            } else {
-                continue;
-            }
-        }
-        if (counterO == boardLength) {
-            // Highlight row.
-            for (let i = 1; i <= boardLength; i++) {
-                document.getElementById(`${row}, ${i}`).classList.add("greenText");
-            }
-            return "lose";
-        }
-        if (counterX == boardLength) {
-            // Highlight row.
-            for (let i = 1; i <= boardLength; i++) {
-                document.getElementById(`${row}, ${i}`).classList.add("greenText");
-            }
-            return "win";
-        }
-    }
-    // Check columns.
-    for (let column = 1; column <= boardLength; column++) {
-        let counterO = 0;
-        let counterX = 0;
-        for (let row = 1; row <= boardLength; row++) {
-            if (bd[row][column] == "X") {
-                counterX ++;
-            } else if (bd[row][column] == "O") {
-                counterO ++;
-            } else {
-                continue;
-            }
-        }
-        if (counterO == boardLength) {
-            // Highlight row.
-            for (let i = 1; i <= boardLength; i++) {
-                document.getElementById(`${i}, ${column}`).classList.add("greenText");
-            }
-            return "lose";
-        }
-        if (counterX == boardLength) {
-            for (let i = 1; i <= boardLength; i++) {
-                document.getElementById(`${i}, ${column}`).classList.add("greenText");
-            }
-            return "win";
-        }
-    }
-    // Check across. Left to Right
-    let counterO = 0;
-    let counterX = 0;
-    for (let i = 1; i <= boardLength; i++) {
-        if (bd[i][i] == "X") {
-            counterX ++;
-        } else if (bd[i][i] == "O") {
-            counterO ++;
-        } else {
-            continue;
-        }
-        if (counterO == boardLength) {
-            // Highlight row.
-            for (let i = 1; i <= boardLength; i++) {
-                document.getElementById(`${i}, ${i}`).classList.add("greenText");
-            }
-            return "lose";
-        }
-        if (counterX == boardLength) {
-            // Highlight row.
-            for (let i = 1; i <= boardLength; i++) {
-                document.getElementById(`${i}, ${i}`).classList.add("greenText");
-            }
-            return "win";
-        }
-    }
-    // Check across. Right to Left
-    counterO = 0;
-    counterX = 0;
-    for (let i = 1; i <= boardLength; i++) {
-        if (bd[i][(Number(boardLength)+1)-i] == "X") {
-            counterX ++;
-        } else if (bd[i][(Number(boardLength)+1)-i] == "O") {
-            counterO ++;
-        } else {
-            continue;
-        }
-        if (counterO == boardLength) {
-            // Highlight row.
-            for (let i = 1; i <= boardLength; i++) {
-                document.getElementById(`${i}, ${(Number(boardLength)+1)-i}`).classList.add("greenText");
-            }
-            return "lose";
-        }
-        if (counterX == boardLength) {
-            // Highlight row.
-            for (let i = 1; i <= boardLength; i++) {
-                document.getElementById(`${i}, ${(Number(boardLength)+1)-i}`).classList.add("greenText");
-            }
-            return "win";
-        }
-    }
-    // Check if its a stalemate.
-    let staleCounter = 0;
-    for (let row = 1; row <= boardLength; row++) {
-        for (let column = 1; column <= boardLength; column++) {
-            if (bd[row][column] == "X" || bd[row][column] == "O") {
-                staleCounter ++;
-            }
-        }
-    }
-    if (staleCounter == boardLength**2) {
-        return "stale";
-    }
+// // Check the validity of an AI move.
+// function validity(bd=[]) {
+//     let boardLength = boardSize;
+//     // FOR PLAYER ONE
+//     // Check rows (easiest)
+//     for (let row = 1; row <= boardLength; row++) {
+//         let counterO = 0
+//         let counterX = 0;
+//         for (let column = 1; column <= boardLength; column++) {
+//             if (bd[row][column] == "O") {
+//                 counterO ++;
+//             } else if (bd[row][column] == "X") {
+//                 counterX ++;
+//             } else {
+//                 continue;
+//             }
+//         }
+//         if (counterO == boardLength) {
+//             // Highlight row.
+//             for (let i = 1; i <= boardLength; i++) {
+//                 document.getElementById(`${row}, ${i}`).classList.add("greenText");
+//             }
+//             return "lose";
+//         }
+//         if (counterX == boardLength) {
+//             // Highlight row.
+//             for (let i = 1; i <= boardLength; i++) {
+//                 document.getElementById(`${row}, ${i}`).classList.add("greenText");
+//             }
+//             return "win";
+//         }
+//     }
+//     // Check columns.
+//     for (let column = 1; column <= boardLength; column++) {
+//         let counterO = 0;
+//         let counterX = 0;
+//         for (let row = 1; row <= boardLength; row++) {
+//             if (bd[row][column] == "X") {
+//                 counterX ++;
+//             } else if (bd[row][column] == "O") {
+//                 counterO ++;
+//             } else {
+//                 continue;
+//             }
+//         }
+//         if (counterO == boardLength) {
+//             // Highlight row.
+//             for (let i = 1; i <= boardLength; i++) {
+//                 document.getElementById(`${i}, ${column}`).classList.add("greenText");
+//             }
+//             return "lose";
+//         }
+//         if (counterX == boardLength) {
+//             for (let i = 1; i <= boardLength; i++) {
+//                 document.getElementById(`${i}, ${column}`).classList.add("greenText");
+//             }
+//             return "win";
+//         }
+//     }
+//     // Check across. Left to Right
+//     let counterO = 0;
+//     let counterX = 0;
+//     for (let i = 1; i <= boardLength; i++) {
+//         if (bd[i][i] == "X") {
+//             counterX ++;
+//         } else if (bd[i][i] == "O") {
+//             counterO ++;
+//         } else {
+//             continue;
+//         }
+//         if (counterO == boardLength) {
+//             // Highlight row.
+//             for (let i = 1; i <= boardLength; i++) {
+//                 document.getElementById(`${i}, ${i}`).classList.add("greenText");
+//             }
+//             return "lose";
+//         }
+//         if (counterX == boardLength) {
+//             // Highlight row.
+//             for (let i = 1; i <= boardLength; i++) {
+//                 document.getElementById(`${i}, ${i}`).classList.add("greenText");
+//             }
+//             return "win";
+//         }
+//     }
+//     // Check across. Right to Left
+//     counterO = 0;
+//     counterX = 0;
+//     for (let i = 1; i <= boardLength; i++) {
+//         if (bd[i][(Number(boardLength)+1)-i] == "X") {
+//             counterX ++;
+//         } else if (bd[i][(Number(boardLength)+1)-i] == "O") {
+//             counterO ++;
+//         } else {
+//             continue;
+//         }
+//         if (counterO == boardLength) {
+//             // Highlight row.
+//             for (let i = 1; i <= boardLength; i++) {
+//                 document.getElementById(`${i}, ${(Number(boardLength)+1)-i}`).classList.add("greenText");
+//             }
+//             return "lose";
+//         }
+//         if (counterX == boardLength) {
+//             // Highlight row.
+//             for (let i = 1; i <= boardLength; i++) {
+//                 document.getElementById(`${i}, ${(Number(boardLength)+1)-i}`).classList.add("greenText");
+//             }
+//             return "win";
+//         }
+//     }
+//     // Check if its a stalemate.
+//     let staleCounter = 0;
+//     for (let row = 1; row <= boardLength; row++) {
+//         for (let column = 1; column <= boardLength; column++) {
+//             if (bd[row][column] == "X" || bd[row][column] == "O") {
+//                 staleCounter ++;
+//             }
+//         }
+//     }
+//     if (staleCounter == boardLength**2) {
+//         return "stale";
+//     }
 
-    return "partial";
-}
+//     return "partial";
+// }
