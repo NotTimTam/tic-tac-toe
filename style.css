@@ -160,7 +160,7 @@ input:hover {
     color: white;
     font-weight: bolder;
 
-    box-shadow: inset -6px -6px 10px #4e260b, 4px 4px 5px black;
+    box-shadow: inset -5px -5px 10px #4e260b, 4px 4px 5px black;
 
     transition-property: all;
     transition-duration: 0.1s;
