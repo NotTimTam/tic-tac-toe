@@ -46,7 +46,7 @@ function resetGame() {
 
     // Turn off the bot if the board is bigger than a 3x3.
     if (boardSize > 3) {
-        
+        vsBot = false;
     }
 
     // Generate the board array.
@@ -72,12 +72,19 @@ function resetGame() {
     }
     boardDisp.style = `grid-template-columns: ${boardStyleString};`;
 
+    // Shrink the board display if its big.
+    if (boardSize >= 6) {
+        boardDisp.style.zoom = `${(10 - boardSize) * 5 + 60}%`;
+        console.log("Shrinking the board...");
+    }
+
     // Display the generated board.
     updateBoard();
 }
 
 // Re-open config.
 function newGame() {
+    boardDisp.style.zoom = "100%";
     boardDisp.innerHTML = `
     <h1>Board Setup</h1>
     <p>Size: <input type="number" name="number" id="boardSize" step="1" min="3" max="10" value="3" onclick="this.blur"></p>

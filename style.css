@@ -181,3 +181,7 @@ input:hover {
 .greenText {
     color: limegreen;
 }
+
+.smallBoard {
+    zoom: 0.5;
+}
